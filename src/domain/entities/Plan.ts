@@ -13,7 +13,7 @@ export interface PlanProps {
   imagenes: string[] // URLs
   cupoMaximo: number
   fechasDisponibles: FechasDisponibles
-  estado: 'ACTIVO' | 'INACTIVO' | 'BORRADOR'
+  estado: 'ACTIVO' | 'INACTIVO'
   createdAt?: Date
   updatedAt?: Date
 }
