@@ -18,4 +18,5 @@ export interface PlanResponseDTO {
   }>
   estado: string
   createdAt: Date
+  updatedAt: Date
 }
