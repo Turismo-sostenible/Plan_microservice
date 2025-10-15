@@ -1,36 +1,27 @@
+// src/config/environment.ts
+
+import 'dotenv/config';
+
 export const config = {
-  // Base de datos
-  mongodb: {
-    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/plans-microservice'
-  },
-  
-  // RabbitMQ
-  rabbitmq: {
-    url: process.env.RABBITMQ_URL || 'amqp://localhost:5672',
-    exchange: 'plans.events',
-  },
-  
-  // Servidor
   server: {
-    port: parseInt(process.env.PORT || '3000'),
-    host: process.env.HOST || 'localhost',
+    port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
+    host: process.env.HOST || '0.0.0.0',
   },
-  
-  // JWT
+  mongodb: {
+    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/plans_service',
+  },
+  rabbitmq: {
+    url: process.env.RABBITMQ_URL || 'amqp://localhost',
+  },
   jwt: {
-    secret: process.env.JWT_SECRET,
-    expiresIn: process.env.JWT_EXPIRES_IN,
+    secret: process.env.JWT_SECRET || 'supersecretkey',
   },
-  
-  // Storage
-  storage: {
-    uploadPath: process.env.UPLOAD_PATH,
-    maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '10485760'), // 10MB
-  },
-  
-  // Logging
-  logging: {
+  logger: {
     level: process.env.LOG_LEVEL || 'info',
-    pretty: process.env.NODE_ENV === 'development',
+  },
+  storage: {
+    local: {
+      path: process.env.STORAGE_PATH || './uploads',
+    },
   },
 };
