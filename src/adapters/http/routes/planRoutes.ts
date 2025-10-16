@@ -16,8 +16,8 @@ export function createPlanRoutes(planController: PlanController): Router {
    */
   router.post(
     '/plans',
-    authMiddleware,              // Valida JWT
-    requireRole(['ADMINISTRADOR']), // Valida rol
+    //authMiddleware,              // Valida JWT
+    //requireRole(['ADMINISTRADOR']), // Valida rol
     uploadMiddleware,            // Procesa multipart/form-data
     planController.createPlan
   )

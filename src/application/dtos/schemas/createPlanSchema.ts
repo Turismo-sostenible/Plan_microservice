@@ -17,7 +17,7 @@ export const createPlanSchema = z.object({
     valor: z.number()
       .int('El precio debe ser un número entero')
       .positive('El precio debe ser mayor a 0'),
-    moneda: z.enum(['COP', 'USD', 'EUR'])
+    moneda: z.enum(['COP', 'USD'])
   }),
 
   duracion: z.number()
