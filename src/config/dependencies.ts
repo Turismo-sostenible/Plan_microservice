@@ -1,11 +1,11 @@
 // src/config/dependencies.ts
 
 import { CreatePlanUseCase } from '../application/use-cases/CreatePlanUseCase';
-import { PlanController } from '../adapters/http/controllers/PlanController';
-import { MongoPlanRepository } from '../infrastructure/persistence/mongoose/MongoPlanRepository';
-import { LocalImageStorage } from '../infrastructure/storage/LocalImageStorage';
-import { RabbitMQPublisher } from '../infrastructure/messaging/RabbitMQPublisher';
-import { PinoLogger } from '../infrastructure/logger/PinoLogger';
+import { PlanController } from '../adapters/driving/http/controllers/PlanController';
+import { MongoPlanRepository } from '../adapters/driven/persistence/mongoose/MongoPlanRepository';
+import { LocalImageStorage } from '../adapters/driven/storage/LocalImageStorage';
+import { RabbitMQPublisher } from '../adapters/driven/messaging/RabbitMQPublisher';
+import { PinoLogger } from '../adapters/driven/logger/PinoLogger';
 import { config } from './environment';
 
 // Logger
