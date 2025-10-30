@@ -68,7 +68,7 @@ import { requireRole } from "../middlewares/roleMiddleware";
 import { uploadMiddleware } from "../middlewares/uploadMiddleware";
 
 export function createPlanRoutes(planController: PlanController): Router {
-  const router = Router()
+  const router = Router();
 
   /**
    * @swagger
@@ -166,15 +166,15 @@ export function createPlanRoutes(planController: PlanController): Router {
    *         description: Error interno del servidor.
    */
   router.post(
-    '/plans',
+    "/plans",
     //authMiddleware,              // Valida JWT
     //requireRole(['ADMINISTRADOR']), // Valida rol
-    uploadMiddleware,            // Procesa multipart/form-data
-    planController.createPlan
-  )
+    uploadMiddleware, // Procesa multipart/form-data
+    planController.createPlan,
+  );
+  router.get("/plans", planController.listPlans);
 
   // Futuras rutas:
-  // router.get('/plans', planController.listPlans)
   // router.get('/plans/:id', planController.getPlan)
   // router.put('/plans/:id', authMiddleware, requireRole(['ADMINISTRADOR']), planController.updatePlan)
   // router.delete('/plans/:id', authMiddleware, requireRole(['ADMINISTRADOR']), planController.deletePlan)

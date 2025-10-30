@@ -1,12 +1,17 @@
-// adapters/http/controllers/PlanController.ts
+// adapters/driving/http/controllers/PlanController.ts
 
-import { Request, Response, NextFunction } from 'express'
-import { CreatePlanUseCase } from '../../../application/use-cases/CreatePlanUseCase'
-import { CreatePlanDTO } from '../../../application/dtos/CreatePlanDTO'
-import { ImageFile } from '../../../application/ports/ImageStoragePort'
+import { NextFunction, Request, Response } from "express";
+import { CreatePlanDTO } from "../../../../application/dtos/CreatePlanDTO";
+import { ImageFile } from "../../../../application/ports/ImageStoragePort";
+import { CreatePlanUseCase } from "../../../../application/use-cases/CreatePlanUseCase";
+import { ListPlansUseCase } from "../../../../application/use-cases/ListPlansUseCase";
+import { ListPlansDTO } from "../../../../application/dtos/ListPlansDTO";
 
 export class PlanController {
-  constructor(private readonly createPlanUseCase: CreatePlanUseCase) {}
+  constructor(
+    private readonly createPlanUseCase: CreatePlanUseCase,
+    private readonly listPlansUseCase: ListPlansUseCase,
+  ) {}
 
   createPlan = async (
     req: Request,
@@ -39,13 +44,12 @@ export class PlanController {
       };
 
       // Ejecutar use case
-      const result = await this.createPlanUseCase.execute(bodyDto)
+      const result = await this.createPlanUseCase.execute(bodyDto);
 
       res.status(201).json({
-        message: 'Plan creado exitosamente',
-        data: result
-      })
-
+        message: "Plan creado exitosamente",
+        data: result,
+      });
     } catch (error) {
       next(error);
     }
@@ -61,7 +65,48 @@ export class PlanController {
       buffer: file.buffer,
       originalName: file.originalname,
       mimetype: file.mimetype,
-      size: file.size
-    }))
+      size: file.size,
+    }));
   }
+
+  listPlans = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      // const tenantId = req.user?.tenantId; // Uncomment when auth is ready
+      // if (!tenantId) {
+      //   res.status(401).json({ message: 'Token inválido o sin tenantId' });
+      //   return;
+      // }
+
+      const dto: ListPlansDTO = {
+        // tenantId,
+        tenantId: req.query.tenantId as string, // Temporary
+        page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
+        limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
+        estado: req.query.estado as any,
+      };
+
+      const result = await this.listPlansUseCase.execute(dto);
+      
+      if (result.plans.length === 0) {
+        res.status(404).json({ message: 'No se encontraron planes' });
+        return;
+      }
+      
+      res.status(200).json({
+        message: "Planes listados exitosamente",
+        data: result.plans,
+        meta: {
+          total: result.total,
+          page: dto.page,
+          limit: dto.limit,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

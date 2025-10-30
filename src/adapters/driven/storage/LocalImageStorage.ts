@@ -3,9 +3,9 @@ import path from 'path'
 import sharp from 'sharp'
 import { v4 as uuidv4 } from 'uuid'
 
-import { ImageStoragePort, ImageFile, SaveImageOptions } from '../../application/ports/ImageStoragePort'
-import { ValidationError } from '../../domain/errors/ValidationError'
-import { LoggerPort } from '../../application/ports/LoggerPort'
+import { ImageStoragePort, ImageFile, SaveImageOptions } from '../../../application/ports/ImageStoragePort'
+import { ValidationError } from '../../../domain/errors/ValidationError'
+import { LoggerPort } from '../../../application/ports/LoggerPort'
 
 export class LocalImageStorage implements ImageStoragePort {
   private readonly baseDir: string

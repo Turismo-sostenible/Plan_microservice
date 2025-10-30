@@ -1,5 +1,5 @@
 import pino, { Logger as PinoLoggerInstance } from 'pino'
-import { LoggerPort, LogContext } from '../../application/ports/LoggerPort'
+import { LoggerPort, LogContext } from '../../../application/ports/LoggerPort'
 
 export class PinoLogger implements LoggerPort {
   private logger: PinoLoggerInstance
