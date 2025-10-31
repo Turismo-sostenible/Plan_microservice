@@ -10,6 +10,7 @@ import { PinoLogger } from "../adapters/driven/logger/PinoLogger";
 import { config } from "./environment";
 import { GetPlanByIdUseCase } from "../application/use-cases/GetPlanByIdUseCase";
 import { DeletePlanUseCase } from "../application/use-cases/DeletePlanUseCase";
+import { UpdatePlanUseCase } from "../application/use-cases/UpdatePlanUseCase";
 
 // Logger
 export const logger = new PinoLogger(config.logger.level);
@@ -49,10 +50,16 @@ export const deletePlanUseCase = new DeletePlanUseCase(
   logger,
 );
 
+export const updatePlanUseCase = new UpdatePlanUseCase(
+  planRepository,
+  logger,
+);
+
 // Controllers
 export const planController = new PlanController(
   createPlanUseCase,
   listPlansUseCase,
   getPlanByIdUseCase,
-  deletePlanUseCase
+  deletePlanUseCase,
+  updatePlanUseCase
 );

@@ -33,7 +33,7 @@ export interface PlanRepositoryPort {
   count(options: Omit<FindOptions, 'skip' | 'limit'>): Promise<number>
 
   /**
-   * Elimina un plan (soft delete si se implementa)
+   * Elimina un plan
    */
   delete(id: string, tenantId: string): Promise<void>
 }

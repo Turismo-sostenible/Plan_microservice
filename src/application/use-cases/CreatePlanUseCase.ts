@@ -25,7 +25,7 @@ export class CreatePlanUseCase {
   ) {}
 
   async execute(dto: CreatePlanDTO): Promise<PlanResponseDTO> {
-    this.logger.info('Iniciando creación de plan', {
+    this.logger.info('Iniciando creacion de plan', {
       tenantId: dto.tenantId,
       nombre: dto.nombre
     })

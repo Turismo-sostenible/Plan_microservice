@@ -11,6 +11,8 @@ import { GetPlanByIdDTO } from "../../../../application/dtos/GetPlanbyIdDTO";
 import { ValidationError } from "../../../../domain/errors/ValidationError";
 import { DeletePlanUseCase } from "../../../../application/use-cases/DeletePlanUseCase";
 import { DeletePlanDTO } from "../../../../application/dtos/DeletePlanDTO";
+import { UpdatePlanUseCase } from "../../../../application/use-cases/UpdatePlanUseCase";
+import { UpdatePlanDTO } from "../../../../application/dtos/UpdatePlanDTO";
 
 export class PlanController {
   constructor(
@@ -18,6 +20,7 @@ export class PlanController {
     private readonly listPlansUseCase: ListPlansUseCase,
     private readonly getPlanByIdUseCase: GetPlanByIdUseCase,
     private readonly deletePlanUseCase: DeletePlanUseCase,
+    private readonly updatePlanUseCase: UpdatePlanUseCase,
   ) {}
 
   createPlan = async (
@@ -188,4 +191,46 @@ export class PlanController {
       next(error);
     }
   };
+  updatePlan = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      // const tenantId = req.user?.tenantId; // Uncomment when auth is ready
+      // if (!tenantId) {
+      //   res.status(401).json({ message: 'Token inválido o sin tenantId' });
+      //   return;
+      // }
+
+      const dto: UpdatePlanDTO = {
+        tenantId: (req.query.tenantId as string) || (req.body?.tenantId as string), // Temporary: admite query o body
+        id: req.params.id as string,
+        nombre: req.body?.nombre,
+        descripcion: req.body?.descripcion,
+        precio: req.body?.precio,
+        duracion: req.body?.duracion,
+        cupoMaximo: req.body?.cupoMaximo,
+        fechasDisponibles: req.body?.fechasDisponibles,
+        estado: req.body?.estado,
+      };
+
+      const result = await this.updatePlanUseCase.execute(dto);
+
+      res.status(200).json({
+        message: "Plan actualizado exitosamente",
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      if (error instanceof Error && error.message === "Plan no encontrado") {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      next(error);
+    }
+  }
 }

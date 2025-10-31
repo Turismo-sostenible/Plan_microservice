@@ -278,7 +278,7 @@ export function createPlanRoutes(planController: PlanController): Router {
    *         description: Error interno del servidor.
    */
   router.get('/plans/:id', planController.getPlanById)
-  
+
   /**
    * @swagger
    * /plans/{id}:
@@ -329,7 +329,89 @@ export function createPlanRoutes(planController: PlanController): Router {
     planController.deletePlan
   );
 
-  // router.put('/plans/:id', authMiddleware, requireRole(['ADMINISTRADOR']), planController.updatePlan)
+  /**
+   * @swagger
+   * /plans/{id}:
+   *   put:
+   *     summary: Actualiza parcialmente un plan por su ID
+   *     description: Actualiza campos del plan. Debe enviarse al menos un campo a modificar.
+   *     tags: [Planes]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *           description: ObjectId de MongoDB (24 caracteres hex)
+   *       - in: query
+   *         name: tenantId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: Identificador del tenant
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               nombre:
+   *                 type: string
+   *               descripcion:
+   *                 type: string
+   *               precio:
+   *                 type: object
+   *                 properties:
+   *                   valor:
+   *                     type: integer
+   *                   moneda:
+   *                     type: string
+   *                     enum: [COP, USD]
+   *               duracion:
+   *                 type: integer
+   *               cupoMaximo:
+   *                 type: integer
+   *               fechasDisponibles:
+   *                 type: array
+   *                 items:
+   *                   type: object
+   *                   properties:
+   *                     desde:
+   *                       type: string
+   *                       format: date-time
+   *                     hasta:
+   *                       type: string
+   *                       format: date-time
+   *               estado:
+   *                 type: string
+   *                 enum: [ACTIVO, INACTIVO]
+   *     responses:
+   *       '200':
+   *         description: Plan actualizado exitosamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   $ref: '#/components/schemas/PlanResponseDTO'
+   *       '400':
+   *         description: Datos inválidos o falta de campos a actualizar.
+   *       '404':
+   *         description: Plan no encontrado.
+   *       '500':
+   *         description: Error interno del servidor.
+   */
+  router.put(
+    '/plans/:id', 
+    //authMiddleware, 
+    //requireRole(['ADMINISTRADOR']), 
+    planController.updatePlan
+  )
 
   return router;
 }
