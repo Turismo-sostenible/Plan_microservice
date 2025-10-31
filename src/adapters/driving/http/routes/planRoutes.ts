@@ -278,9 +278,58 @@ export function createPlanRoutes(planController: PlanController): Router {
    *         description: Error interno del servidor.
    */
   router.get('/plans/:id', planController.getPlanById)
-  // Futuras rutas:
+  
+  /**
+   * @swagger
+   * /plans/{id}:
+   *   delete:
+   *     summary: Elimina (soft delete) un plan por su ID
+   *     description: Marca el plan como INACTIVO.
+   *     tags: [Planes]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *           description: ObjectId de MongoDB (24 caracteres hex)
+   *       - in: query
+   *         name: tenantId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: Identificador del tenant
+   *     responses:
+   *       '200':
+   *         description: Plan eliminado exitosamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     id:
+   *                       type: string
+   *       '400':
+   *         description: Parámetros inválidos.
+   *       '404':
+   *         description: Plan no encontrado.
+   *       '500':
+   *         description: Error interno del servidor.
+   */
+  router.delete(
+    '/plans/:id', 
+    //authMiddleware, 
+    //requireRole(['ADMINISTRADOR']), 
+    planController.deletePlan
+  );
+
   // router.put('/plans/:id', authMiddleware, requireRole(['ADMINISTRADOR']), planController.updatePlan)
-  // router.delete('/plans/:id', authMiddleware, requireRole(['ADMINISTRADOR']), planController.deletePlan)
 
   return router;
 }

@@ -31,9 +31,10 @@ const options: swaggerJSDoc.Options = {
     ],
   },
   apis: [
-    path.join(__dirname, './routes/*.ts'),
-    path.join(__dirname, '../application/dtos/*.ts')
-],
+    // Usa paths absolutos desde la raíz del proyecto para evitar problemas de build (dist/src)
+    path.resolve(process.cwd(), 'src/adapters/driving/http/routes/**/*.ts'),
+    path.resolve(process.cwd(), 'src/application/dtos/**/*.ts'),
+  ],
 };
 
 export const swaggerSpec = swaggerJSDoc(options);

@@ -9,12 +9,15 @@ import { ListPlansDTO } from "../../../../application/dtos/ListPlansDTO";
 import { GetPlanByIdUseCase } from "../../../../application/use-cases/GetPlanByIdUseCase";
 import { GetPlanByIdDTO } from "../../../../application/dtos/GetPlanbyIdDTO";
 import { ValidationError } from "../../../../domain/errors/ValidationError";
+import { DeletePlanUseCase } from "../../../../application/use-cases/DeletePlanUseCase";
+import { DeletePlanDTO } from "../../../../application/dtos/DeletePlanDTO";
 
 export class PlanController {
   constructor(
     private readonly createPlanUseCase: CreatePlanUseCase,
     private readonly listPlansUseCase: ListPlansUseCase,
     private readonly getPlanByIdUseCase: GetPlanByIdUseCase,
+    private readonly deletePlanUseCase: DeletePlanUseCase,
   ) {}
 
   createPlan = async (
@@ -135,6 +138,42 @@ export class PlanController {
 
       res.status(200).json({
         message: "Plan obtenido exitosamente",
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      if (error instanceof Error && error.message === "Plan no encontrado") {
+        res.status(404).json({ message: error.message });
+        return;
+      }
+      next(error);
+    }
+  };
+  
+  deletePlan = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      // const tenantId = req.user?.tenantId; // Uncomment when auth is ready
+      // if (!tenantId) {
+      //   res.status(401).json({ message: 'Token inválido o sin tenantId' });
+      //   return;
+      // }
+
+      const dto: DeletePlanDTO = {
+        tenantId: req.query.tenantId as string, // Temporary
+        id: req.params.id as string,
+      };
+
+      const result = await this.deletePlanUseCase.execute(dto);
+
+      res.status(200).json({
+        message: "Plan eliminado exitosamente",
         data: result,
       });
     } catch (error) {

@@ -9,6 +9,7 @@ import { RabbitMQPublisher } from "../adapters/driven/messaging/RabbitMQPublishe
 import { PinoLogger } from "../adapters/driven/logger/PinoLogger";
 import { config } from "./environment";
 import { GetPlanByIdUseCase } from "../application/use-cases/GetPlanByIdUseCase";
+import { DeletePlanUseCase } from "../application/use-cases/DeletePlanUseCase";
 
 // Logger
 export const logger = new PinoLogger(config.logger.level);
@@ -34,12 +35,17 @@ export const createPlanUseCase = new CreatePlanUseCase(
 );
 
 export const listPlansUseCase = new ListPlansUseCase(
-  planRepository, 
+  planRepository,
   logger
 );
 
 export const getPlanByIdUseCase = new GetPlanByIdUseCase(
-planRepository,
+  planRepository,
+  logger,
+);
+
+export const deletePlanUseCase = new DeletePlanUseCase(
+  planRepository,
   logger,
 );
 
@@ -47,5 +53,6 @@ planRepository,
 export const planController = new PlanController(
   createPlanUseCase,
   listPlansUseCase,
-  getPlanByIdUseCase
+  getPlanByIdUseCase,
+  deletePlanUseCase
 );
