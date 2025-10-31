@@ -6,11 +6,15 @@ import { ImageFile } from "../../../../application/ports/ImageStoragePort";
 import { CreatePlanUseCase } from "../../../../application/use-cases/CreatePlanUseCase";
 import { ListPlansUseCase } from "../../../../application/use-cases/ListPlansUseCase";
 import { ListPlansDTO } from "../../../../application/dtos/ListPlansDTO";
+import { GetPlanByIdUseCase } from "../../../../application/use-cases/GetPlanByIdUseCase";
+import { GetPlanByIdDTO } from "../../../../application/dtos/GetPlanbyIdDTO";
+import { ValidationError } from "../../../../domain/errors/ValidationError";
 
 export class PlanController {
   constructor(
     private readonly createPlanUseCase: CreatePlanUseCase,
     private readonly listPlansUseCase: ListPlansUseCase,
+    private readonly getPlanByIdUseCase: GetPlanByIdUseCase,
   ) {}
 
   createPlan = async (
@@ -106,6 +110,42 @@ export class PlanController {
         },
       });
     } catch (error) {
+      next(error);
+    }
+  };
+
+  getPlanById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void> => {
+    try {
+      // const tenantId = req.user?.tenantId; // Uncomment when auth is ready
+      // if (!tenantId) {
+      //   res.status(401).json({ message: 'Token inválido o sin tenantId' });
+      //   return;
+      // }
+
+      const dto: GetPlanByIdDTO = {
+        tenantId: req.query.tenantId as string, // Temporary
+        id: req.params.id as string,
+      };
+
+      const result = await this.getPlanByIdUseCase.execute(dto);
+
+      res.status(200).json({
+        message: "Plan obtenido exitosamente",
+        data: result,
+      });
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        res.status(400).json({ message: error.message });
+        return;
+      }
+      if (error instanceof Error && error.message === "Plan no encontrado") {
+        res.status(404).json({ message: error.message });
+        return;
+      }
       next(error);
     }
   };

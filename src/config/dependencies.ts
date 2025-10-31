@@ -8,6 +8,7 @@ import { LocalImageStorage } from "../adapters/driven/storage/LocalImageStorage"
 import { RabbitMQPublisher } from "../adapters/driven/messaging/RabbitMQPublisher";
 import { PinoLogger } from "../adapters/driven/logger/PinoLogger";
 import { config } from "./environment";
+import { GetPlanByIdUseCase } from "../application/use-cases/GetPlanByIdUseCase";
 
 // Logger
 export const logger = new PinoLogger(config.logger.level);
@@ -32,10 +33,19 @@ export const createPlanUseCase = new CreatePlanUseCase(
   logger,
 );
 
-export const listPlansUseCase = new ListPlansUseCase(planRepository, logger);
+export const listPlansUseCase = new ListPlansUseCase(
+  planRepository, 
+  logger
+);
+
+export const getPlanByIdUseCase = new GetPlanByIdUseCase(
+planRepository,
+  logger,
+);
 
 // Controllers
 export const planController = new PlanController(
   createPlanUseCase,
   listPlansUseCase,
+  getPlanByIdUseCase
 );

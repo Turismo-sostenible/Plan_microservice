@@ -172,10 +172,113 @@ export function createPlanRoutes(planController: PlanController): Router {
     uploadMiddleware, // Procesa multipart/form-data
     planController.createPlan,
   );
+  /**
+   * @swagger
+   * /plans:
+   *   get:
+   *     summary: Lista planes turísticos
+   *     description: Retorna una lista paginada de planes filtrados por tenant y estado.
+   *     tags: [Planes]
+   *     parameters:
+   *       - in: query
+   *         name: tenantId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: Identificador del tenant
+   *       - in: query
+   *         name: page
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           default: 1
+   *       - in: query
+   *         name: limit
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 100
+   *           default: 10
+   *       - in: query
+   *         name: estado
+   *         schema:
+   *           type: string
+   *           enum: [ACTIVO, INACTIVO]
+   *     responses:
+   *       '200':
+   *         description: Planes listados exitosamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/PlanResponseDTO'
+   *                 meta:
+   *                   type: object
+   *                   properties:
+   *                     total:
+   *                       type: integer
+   *                     page:
+   *                       type: integer
+   *                     limit:
+   *                       type: integer
+   *       '400':
+   *         description: Parámetros inválidos.
+   *       '404':
+   *         description: No se encontraron planes.
+   *       '500':
+   *         description: Error interno del servidor.
+   */
   router.get("/plans", planController.listPlans);
 
+  /**
+   * @swagger
+   * /plans/{id}:
+   *   get:
+   *     summary: Obtiene un plan por su ID
+   *     description: Retorna los detalles de un plan específico.
+   *     tags: [Planes]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *           description: ObjectId de MongoDB (24 caracteres hex)
+   *       - in: query
+   *         name: tenantId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: Identificador del tenant
+   *     responses:
+   *       '200':
+   *         description: Plan obtenido exitosamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   $ref: '#/components/schemas/PlanResponseDTO'
+   *       '400':
+   *         description: Parámetros inválidos.
+   *       '404':
+   *         description: Plan no encontrado.
+   *       '500':
+   *         description: Error interno del servidor.
+   */
+  router.get('/plans/:id', planController.getPlanById)
   // Futuras rutas:
-  // router.get('/plans/:id', planController.getPlan)
   // router.put('/plans/:id', authMiddleware, requireRole(['ADMINISTRADOR']), planController.updatePlan)
   // router.delete('/plans/:id', authMiddleware, requireRole(['ADMINISTRADOR']), planController.deletePlan)
 
