@@ -61,6 +61,10 @@ export class PlanController {
         data: result,
       });
     } catch (error) {
+      if (error instanceof ValidationError) {
+        res.status(400).json({ message: error.message });
+        return;
+      }
       next(error);
     }
   };
@@ -116,6 +120,10 @@ export class PlanController {
         },
       });
     } catch (error) {
+      if (error instanceof ValidationError) {
+        res.status(400).json({ message: error.message });
+        return;
+      }
       next(error);
     }
   };
