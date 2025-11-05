@@ -1,5 +1,5 @@
 import { OutboxModel } from '../persistence/mongoose/models/OutboxModel'
-import { LoggerPort } from '../../application/ports/LoggerPort'
+import { LoggerPort } from '../../../application/ports/LoggerPort'
 import * as amqp from 'amqplib'
 import {ChannelModel} from "amqplib";
 

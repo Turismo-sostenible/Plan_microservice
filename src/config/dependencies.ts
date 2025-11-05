@@ -1,12 +1,16 @@
 // src/config/dependencies.ts
 
-import { CreatePlanUseCase } from '../application/use-cases/CreatePlanUseCase';
-import { PlanController } from '../adapters/driving/http/controllers/PlanController';
-import { MongoPlanRepository } from '../adapters/driven/persistence/mongoose/MongoPlanRepository';
-import { LocalImageStorage } from '../adapters/driven/storage/LocalImageStorage';
-import { RabbitMQPublisher } from '../adapters/driven/messaging/RabbitMQPublisher';
-import { PinoLogger } from '../adapters/driven/logger/PinoLogger';
-import { config } from './environment';
+import { CreatePlanUseCase } from "../application/use-cases/CreatePlanUseCase";
+import { ListPlansUseCase } from "../application/use-cases/ListPlansUseCase";
+import { PlanController } from "../adapters/driving/http/controllers/PlanController";
+import { MongoPlanRepository } from "../adapters/driven/persistence/mongoose/MongoPlanRepository";
+import { LocalImageStorage } from "../adapters/driven/storage/LocalImageStorage";
+import { RabbitMQPublisher } from "../adapters/driven/messaging/RabbitMQPublisher";
+import { PinoLogger } from "../adapters/driven/logger/PinoLogger";
+import { config } from "./environment";
+import { GetPlanByIdUseCase } from "../application/use-cases/GetPlanByIdUseCase";
+import { DeletePlanUseCase } from "../application/use-cases/DeletePlanUseCase";
+import { UpdatePlanUseCase } from "../application/use-cases/UpdatePlanUseCase";
 
 // Logger
 export const logger = new PinoLogger(config.logger.level);
@@ -15,7 +19,10 @@ export const logger = new PinoLogger(config.logger.level);
 export const planRepository = new MongoPlanRepository();
 
 // Storage
-export const imageStorage = new LocalImageStorage(config.storage.local.path, logger);
+export const imageStorage = new LocalImageStorage(
+  config.storage.local.path,
+  logger,
+);
 
 // Message Bus
 export const messageBus = new RabbitMQPublisher(config.rabbitmq.url, logger);
@@ -25,8 +32,34 @@ export const createPlanUseCase = new CreatePlanUseCase(
   planRepository,
   imageStorage,
   messageBus,
+  logger,
+);
+
+export const listPlansUseCase = new ListPlansUseCase(
+  planRepository,
   logger
 );
 
+export const getPlanByIdUseCase = new GetPlanByIdUseCase(
+  planRepository,
+  logger,
+);
+
+export const deletePlanUseCase = new DeletePlanUseCase(
+  planRepository,
+  logger,
+);
+
+export const updatePlanUseCase = new UpdatePlanUseCase(
+  planRepository,
+  logger,
+);
+
 // Controllers
-export const planController = new PlanController(createPlanUseCase);
+export const planController = new PlanController(
+  createPlanUseCase,
+  listPlansUseCase,
+  getPlanByIdUseCase,
+  deletePlanUseCase,
+  updatePlanUseCase
+);

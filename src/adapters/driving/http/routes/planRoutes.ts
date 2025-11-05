@@ -68,7 +68,7 @@ import { requireRole } from "../middlewares/roleMiddleware";
 import { uploadMiddleware } from "../middlewares/uploadMiddleware";
 
 export function createPlanRoutes(planController: PlanController): Router {
-  const router = Router()
+  const router = Router();
 
   /**
    * @swagger
@@ -166,18 +166,252 @@ export function createPlanRoutes(planController: PlanController): Router {
    *         description: Error interno del servidor.
    */
   router.post(
-    '/plans',
+    "/plans",
     //authMiddleware,              // Valida JWT
     //requireRole(['ADMINISTRADOR']), // Valida rol
-    uploadMiddleware,            // Procesa multipart/form-data
-    planController.createPlan
-  )
+    uploadMiddleware, // Procesa multipart/form-data
+    planController.createPlan,
+  );
+  /**
+   * @swagger
+   * /plans:
+   *   get:
+   *     summary: Lista planes turísticos
+   *     description: Retorna una lista paginada de planes filtrados por tenant y estado.
+   *     tags: [Planes]
+   *     parameters:
+   *       - in: query
+   *         name: tenantId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: Identificador del tenant
+   *       - in: query
+   *         name: page
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           default: 1
+   *       - in: query
+   *         name: limit
+   *         schema:
+   *           type: integer
+   *           minimum: 1
+   *           maximum: 100
+   *           default: 10
+   *       - in: query
+   *         name: estado
+   *         schema:
+   *           type: string
+   *           enum: [ACTIVO, INACTIVO]
+   *     responses:
+   *       '200':
+   *         description: Planes listados exitosamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/PlanResponseDTO'
+   *                 meta:
+   *                   type: object
+   *                   properties:
+   *                     total:
+   *                       type: integer
+   *                     page:
+   *                       type: integer
+   *                     limit:
+   *                       type: integer
+   *       '400':
+   *         description: Parámetros inválidos.
+   *       '404':
+   *         description: No se encontraron planes.
+   *       '500':
+   *         description: Error interno del servidor.
+   */
+  router.get("/plans", planController.listPlans);
 
-  // Futuras rutas:
-  // router.get('/plans', planController.listPlans)
-  // router.get('/plans/:id', planController.getPlan)
-  // router.put('/plans/:id', authMiddleware, requireRole(['ADMINISTRADOR']), planController.updatePlan)
-  // router.delete('/plans/:id', authMiddleware, requireRole(['ADMINISTRADOR']), planController.deletePlan)
+  /**
+   * @swagger
+   * /plans/{id}:
+   *   get:
+   *     summary: Obtiene un plan por su ID
+   *     description: Retorna los detalles de un plan específico.
+   *     tags: [Planes]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *           description: ObjectId de MongoDB (24 caracteres hex)
+   *       - in: query
+   *         name: tenantId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: Identificador del tenant
+   *     responses:
+   *       '200':
+   *         description: Plan obtenido exitosamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   $ref: '#/components/schemas/PlanResponseDTO'
+   *       '400':
+   *         description: Parámetros inválidos.
+   *       '404':
+   *         description: Plan no encontrado.
+   *       '500':
+   *         description: Error interno del servidor.
+   */
+  router.get('/plans/:id', planController.getPlanById)
+
+  /**
+   * @swagger
+   * /plans/{id}:
+   *   delete:
+   *     summary: Elimina (soft delete) un plan por su ID
+   *     description: Marca el plan como INACTIVO.
+   *     tags: [Planes]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *           description: ObjectId de MongoDB (24 caracteres hex)
+   *       - in: query
+   *         name: tenantId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: Identificador del tenant
+   *     responses:
+   *       '200':
+   *         description: Plan eliminado exitosamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   *                   properties:
+   *                     id:
+   *                       type: string
+   *       '400':
+   *         description: Parámetros inválidos.
+   *       '404':
+   *         description: Plan no encontrado.
+   *       '500':
+   *         description: Error interno del servidor.
+   */
+  router.delete(
+    '/plans/:id', 
+    //authMiddleware, 
+    //requireRole(['ADMINISTRADOR']), 
+    planController.deletePlan
+  );
+
+  /**
+   * @swagger
+   * /plans/{id}:
+   *   put:
+   *     summary: Actualiza parcialmente un plan por su ID
+   *     description: Actualiza campos del plan. Debe enviarse al menos un campo a modificar.
+   *     tags: [Planes]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *           description: ObjectId de MongoDB (24 caracteres hex)
+   *       - in: query
+   *         name: tenantId
+   *         required: true
+   *         schema:
+   *           type: string
+   *           format: uuid
+   *         description: Identificador del tenant
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               nombre:
+   *                 type: string
+   *               descripcion:
+   *                 type: string
+   *               precio:
+   *                 type: object
+   *                 properties:
+   *                   valor:
+   *                     type: integer
+   *                   moneda:
+   *                     type: string
+   *                     enum: [COP, USD]
+   *               duracion:
+   *                 type: integer
+   *               cupoMaximo:
+   *                 type: integer
+   *               fechasDisponibles:
+   *                 type: array
+   *                 items:
+   *                   type: object
+   *                   properties:
+   *                     desde:
+   *                       type: string
+   *                       format: date-time
+   *                     hasta:
+   *                       type: string
+   *                       format: date-time
+   *               estado:
+   *                 type: string
+   *                 enum: [ACTIVO, INACTIVO]
+   *     responses:
+   *       '200':
+   *         description: Plan actualizado exitosamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                 data:
+   *                   $ref: '#/components/schemas/PlanResponseDTO'
+   *       '400':
+   *         description: Datos inválidos o falta de campos a actualizar.
+   *       '404':
+   *         description: Plan no encontrado.
+   *       '500':
+   *         description: Error interno del servidor.
+   */
+  router.put(
+    '/plans/:id', 
+    //authMiddleware, 
+    //requireRole(['ADMINISTRADOR']), 
+    planController.updatePlan
+  )
 
   return router;
 }

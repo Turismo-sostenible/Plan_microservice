@@ -1,6 +1,6 @@
 import * as amqp from 'amqplib';
-import { MessageBusPort } from '../../application/ports/MessageBusPort';
-import { LoggerPort } from '../../application/ports/LoggerPort';
+import { MessageBusPort } from '../../../application/ports/MessageBusPort';
+import { LoggerPort } from '../../../application/ports/LoggerPort';
 import { OutboxModel } from '../persistence/mongoose/models/OutboxModel';
 import {ChannelModel} from "amqplib";
 

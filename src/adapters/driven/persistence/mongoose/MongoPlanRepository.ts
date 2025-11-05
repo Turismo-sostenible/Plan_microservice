@@ -1,13 +1,16 @@
-import { PlanRepositoryPort, FindOptions } from '../../../application/ports/PlanRepositoryPort'
-import { Plan } from '../../../domain/entities/Plan'
-import { Precio } from '../../../domain/value-objects/Precio'
-import { Duracion } from '../../../domain/value-objects/Duracion'
-import { FechasDisponibles } from '../../../domain/value-objects/FechasDisponibles'
-import { PlanModel } from './models/PlanModel'
+import {
+  PlanRepositoryPort,
+  FindOptions,
+} from "../../../../application/ports/PlanRepositoryPort";
+import { Plan } from "../../../../domain/entities/Plan";
+import { Precio } from "../../../../domain/value-objects/Precio";
+import { Duracion } from "../../../../domain/value-objects/Duracion";
+import { FechasDisponibles } from "../../../../domain/value-objects/FechasDisponibles";
+import { PlanModel } from "./models/PlanModel";
 
 export class MongoPlanRepository implements PlanRepositoryPort {
   async save(plan: Plan): Promise<Plan> {
-    const planData = plan.toObject()
+    const planData = plan.toObject();
 
     // Si tiene ID, es actualización; si no, es creación
     if (planData.id) {
@@ -17,16 +20,16 @@ export class MongoPlanRepository implements PlanRepositoryPort {
           ...planData,
           precio: plan.precio.toObject(),
           duracion: plan.duracion.value,
-          fechasDisponibles: plan.fechasDisponibles.toArray()
+          fechasDisponibles: plan.fechasDisponibles.toArray(),
         },
-        { new: true, runValidators: true }
-      )
+        { new: true, runValidators: true },
+      );
 
       if (!updated) {
-        throw new Error(`Plan con id ${planData.id} no encontrado`)
+        throw new Error(`Plan con id ${planData.id} no encontrado`);
       }
 
-      return this.mapToDomain(updated)
+      return this.mapToDomain(updated);
     }
 
     // Crear nuevo plan
@@ -39,53 +42,53 @@ export class MongoPlanRepository implements PlanRepositoryPort {
       imagenes: plan.imagenes,
       cupoMaximo: plan.cupoMaximo,
       fechasDisponibles: plan.fechasDisponibles.toArray(),
-      estado: plan.estado
-    })
+      estado: plan.estado,
+    });
 
-    const saved = await newPlan.save()
-    return this.mapToDomain(saved)
+    const saved = await newPlan.save();
+    return this.mapToDomain(saved);
   }
 
   async findById(id: string, tenantId: string): Promise<Plan | null> {
-    const plan = await PlanModel.findOne({ _id: id, tenantId }).lean()
+    const plan = await PlanModel.findOne({ _id: id, tenantId }).lean();
 
-    if (!plan) return null
+    if (!plan) return null;
 
-    return this.mapToDomain(plan)
+    return this.mapToDomain(plan);
   }
 
   async findAll(options: FindOptions): Promise<Plan[]> {
-    const query: any = { tenantId: options.tenantId }
+    const query: any = { tenantId: options.tenantId };
 
     if (options.estado) {
-      query.estado = options.estado
+      query.estado = options.estado;
     }
 
     const plans = await PlanModel.find(query)
       .skip(options.skip || 0)
       .limit(options.limit || 20)
       .sort({ createdAt: -1 })
-      .lean()
+      .lean();
 
-    return plans.map(plan => this.mapToDomain(plan))
+    return plans.map((plan) => this.mapToDomain(plan));
   }
 
-  async count(options: Omit<FindOptions, 'skip' | 'limit'>): Promise<number> {
-    const query: any = { tenantId: options.tenantId }
+  async count(options: Omit<FindOptions, "skip" | "limit">): Promise<number> {
+    const query: any = { tenantId: options.tenantId };
 
     if (options.estado) {
-      query.estado = options.estado
+      query.estado = options.estado;
     }
 
-    return PlanModel.countDocuments(query)
+    return PlanModel.countDocuments(query);
   }
 
   async delete(id: string, tenantId: string): Promise<void> {
     // Soft delete: cambiar estado a INACTIVO
     await PlanModel.findOneAndUpdate(
       { _id: id, tenantId },
-      { estado: 'INACTIVO' }
-    )
+      { estado: "INACTIVO" },
+    );
   }
 
   // Mapeo de Mongoose Document a Domain Entity
@@ -102,7 +105,7 @@ export class MongoPlanRepository implements PlanRepositoryPort {
       fechasDisponibles: new FechasDisponibles(doc.fechasDisponibles),
       estado: doc.estado,
       createdAt: doc.createdAt,
-      updatedAt: doc.updatedAt
-    })
+      updatedAt: doc.updatedAt,
+    });
   }
 }

@@ -84,7 +84,7 @@ export class Plan {
   get imagenes(): string[] { return [...this.props.imagenes] } // Copia defensiva
   get cupoMaximo(): number { return this.props.cupoMaximo }
   get fechasDisponibles(): FechasDisponibles { return this.props.fechasDisponibles }
-  get estado(): 'ACTIVO' | 'INACTIVO' | 'BORRADOR' { return this.props.estado }
+  get estado(): 'ACTIVO' | 'INACTIVO' { return this.props.estado }
 
   // Métodos de negocio
   activar(): void {
