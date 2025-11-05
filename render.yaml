@@ -10,12 +10,22 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 10000  # Render usa puerto 10000 por defecto
+      - key: HOST
+        value: 0.0.0.0
       - key: MONGODB_URI
-        sync: false  # Debes configurarlo manualmente en el dashboard
+        sync: false  # Configura en dashboard
       - key: RABBITMQ_URL
-        sync: false  # Debes configurarlo manualmente en el dashboard
-      - key: STORAGE_PATH
-        value: /tmp/uploads  # En free usa /tmp (se pierde en redeploys)
+        sync: false  # Configura en dashboard
+      - key: UPLOAD_PATH
+        value: /tmp/uploads
+      - key: MAX_FILE_SIZE
+        value: 10485760
+      - key: LOG_LEVEL
+        value: info
+      - key: CORS_ORIGIN
+        sync: false  # Configura en dashboard con tu dominio
 
   # Worker para el Patrón Outbox
   - type: worker
