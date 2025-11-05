@@ -1,7 +1,5 @@
 // src/config/environment.ts
 
-import "dotenv/config";
-
 export const config = {
   server: {
     port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
