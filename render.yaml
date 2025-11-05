@@ -1,0 +1,33 @@
+services:
+  # Servicio Web Principal
+  - type: web
+    name: microservice-plans
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false  # Debes configurarlo manualmente en el dashboard
+      - key: RABBITMQ_URL
+        sync: false  # Debes configurarlo manualmente en el dashboard
+      - key: STORAGE_PATH
+        value: /tmp/uploads  # En free usa /tmp (se pierde en redeploys)
+
+  # Worker para el Patrón Outbox
+  - type: worker
+    name: outbox-worker
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:worker
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: RABBITMQ_URL
+        sync: false

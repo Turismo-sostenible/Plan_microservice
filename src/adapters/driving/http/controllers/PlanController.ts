@@ -29,16 +29,16 @@ export class PlanController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      // const tenantId = req.user?.tenantId; // Uncomment when auth is ready
-      // if (!tenantId) {
-      //   res.status(401).json({ message: 'Token inválido o sin tenantId' });
-      //   return;
-      // }
+      const tenantId = req.headers["tenant_id"] as string;
+      if (!tenantId) {
+        res.status(400).json({ message: "El header tenant_id es requerido" });
+        return;
+      }
 
       const dto = JSON.parse(req.body.dto);
 
       const bodyDto: CreatePlanDTO = {
-        tenantId: dto.tenantId,
+        tenantId: tenantId,
         nombre: dto.nombre,
         descripcion: dto.descripcion,
         precio: {
@@ -89,27 +89,26 @@ export class PlanController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      // const tenantId = req.user?.tenantId; // Uncomment when auth is ready
-      // if (!tenantId) {
-      //   res.status(401).json({ message: 'Token inválido o sin tenantId' });
-      //   return;
-      // }
+      const tenantId = req.headers["tenant_id"] as string;
+      if (!tenantId) {
+        res.status(400).json({ message: "El header tenant_id es requerido" });
+        return;
+      }
 
       const dto: ListPlansDTO = {
-        // tenantId,
-        tenantId: req.query.tenantId as string, // Temporary
+        tenantId: tenantId,
         page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
         limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
         estado: req.query.estado as any,
       };
 
       const result = await this.listPlansUseCase.execute(dto);
-      
+
       if (result.plans.length === 0) {
-        res.status(404).json({ message: 'No se encontraron planes' });
+        res.status(404).json({ message: "No se encontraron planes" });
         return;
       }
-      
+
       res.status(200).json({
         message: "Planes listados exitosamente",
         data: result.plans,
@@ -134,14 +133,14 @@ export class PlanController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      // const tenantId = req.user?.tenantId; // Uncomment when auth is ready
-      // if (!tenantId) {
-      //   res.status(401).json({ message: 'Token inválido o sin tenantId' });
-      //   return;
-      // }
+      const tenantId = req.headers["tenant_id"] as string;
+      if (!tenantId) {
+        res.status(400).json({ message: "El header tenant_id es requerido" });
+        return;
+      }
 
       const dto: GetPlanByIdDTO = {
-        tenantId: req.query.tenantId as string, // Temporary
+        tenantId: tenantId,
         id: req.params.id as string,
       };
 
@@ -163,21 +162,21 @@ export class PlanController {
       next(error);
     }
   };
-  
+
   deletePlan = async (
     req: Request,
     res: Response,
     next: NextFunction,
   ): Promise<void> => {
     try {
-      // const tenantId = req.user?.tenantId; // Uncomment when auth is ready
-      // if (!tenantId) {
-      //   res.status(401).json({ message: 'Token inválido o sin tenantId' });
-      //   return;
-      // }
+      const tenantId = req.headers["tenant_id"] as string;
+      if (!tenantId) {
+        res.status(400).json({ message: "El header tenant_id es requerido" });
+        return;
+      }
 
       const dto: DeletePlanDTO = {
-        tenantId: req.query.tenantId as string, // Temporary
+        tenantId: tenantId,
         id: req.params.id as string,
       };
 
@@ -205,14 +204,14 @@ export class PlanController {
     next: NextFunction,
   ): Promise<void> => {
     try {
-      // const tenantId = req.user?.tenantId; // Uncomment when auth is ready
-      // if (!tenantId) {
-      //   res.status(401).json({ message: 'Token inválido o sin tenantId' });
-      //   return;
-      // }
+      const tenantId = req.headers["tenant_id"] as string;
+      if (!tenantId) {
+        res.status(400).json({ message: "El header tenant_id es requerido" });
+        return;
+      }
 
       const dto: UpdatePlanDTO = {
-        tenantId: (req.query.tenantId as string) || (req.body?.tenantId as string), // Temporary: admite query o body
+        tenantId: tenantId,
         id: req.params.id as string,
         nombre: req.body?.nombre,
         descripcion: req.body?.descripcion,
@@ -240,5 +239,5 @@ export class PlanController {
       }
       next(error);
     }
-  }
+  };
 }
