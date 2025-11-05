@@ -148,8 +148,8 @@ src/
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone <URL_DEL_REPOSITORIO>
-    cd microServiceCreatePlan
+    git clone https://github.com/Turismo-sostenible/Plan_microservice.git
+    cd Plan_microservice
     ```
 
 2.  **Instalar dependencias:**
