@@ -26,18 +26,3 @@ services:
         value: info
       - key: CORS_ORIGIN
         sync: false  # Configura en dashboard con tu dominio
-
-  # Worker para el Patrón Outbox
-  - type: worker
-    name: outbox-worker
-    runtime: node
-    plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm run start:worker
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: MONGODB_URI
-        sync: false
-      - key: RABBITMQ_URL
-        sync: false
