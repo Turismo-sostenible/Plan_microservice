@@ -1,50 +1,64 @@
-# Stage 1: Build
-FROM node:24-alpine AS builder
+# Etapa 1: Construcción (Builder)
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copiar archivos de dependencias
+# Copiamos archivos de dependencias
 COPY package*.json ./
 
-# Instalar dependencias
-RUN npm ci --only=production && \
-    npm cache clean --force
+# Instalamos todas las dependencias (incluyendo devDependencies para compilar)
+RUN npm ci
 
-# Copiar código fuente
-COPY tsconfig.json ./
-COPY src ./src
+# Copiamos el código fuente
+COPY . .
 
-# Compilar TypeScript
-RUN npm install -g typescript && \
-    tsc
+# Compilamos TypeScript a JavaScript (crea carpeta dist)
+RUN npm run build
 
-# Stage 2: Runtime
-FROM node:24-alpine
+# Etapa 2: Producción (Runner)
+FROM node:22-alpine AS runner
 
 WORKDIR /app
 
-# Instalar dumb-init para manejar señales correctamente
-RUN apk add --no-cache dumb-init
+# Instalamos solo dependencias de producción para aligerar la imagen
+COPY package*.json ./
+RUN npm ci --only=production
 
-# Copiar node_modules desde el builder
-COPY --from=builder /app/node_modules ./node_modules
-
-# Copiar código compilado
+# Copiamos los archivos compilados desde la etapa anterior
 COPY --from=builder /app/dist ./dist
 
-# Copiar archivos de configuración
-COPY package.json ./
+# Creamos el directorio de uploads y asignamos permisos al usuario 'node'
+RUN mkdir -p uploads && chown -R node:node uploads
 
-# Crear directorio para uploads
-RUN mkdir -p ./uploads
+# --- Variables de Entorno Solicitadas ---
+# Base de datos (Nota: localhost aquí se refiere al contenedor mismo)
+ENV MONGODB_URI=mongodb://host.docker.internal:27017/plans-microservice
 
-# Exponer puerto
-EXPOSE 3000
+# RabbitMQ
+ENV RABBITMQ_URL=amqp://host.docker.internal:5672
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD node -e "require('http').get('http://localhost:3000/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+# Servidor
+ENV PORT=3002
+# IMPORTANTE: En Docker debe ser 0.0.0.0 para ser accesible desde fuera
+ENV HOST=0.0.0.0
+# Usamos production para evitar errores con pino-pretty (que es devDependency)
+ENV NODE_ENV=production
 
-# Usar dumb-init para iniciar la aplicación
-ENTRYPOINT ["/usr/sbin/dumb-init", "--"]
-CMD ["node", "dist/server.js"]
+# Storage
+ENV UPLOAD_PATH=./uploads
+ENV MAX_FILE_SIZE=10485760
+
+# Logging
+ENV LOG_LEVEL=info
+
+# CORS
+ENV CORS_ORIGIN=http://localhost:3000
+
+# Exponemos el puerto
+EXPOSE 3002
+
+# Usamos el usuario node por seguridad (no root)
+USER node
+
+# Comando de inicio
+CMD ["npm", "run", "start"]
