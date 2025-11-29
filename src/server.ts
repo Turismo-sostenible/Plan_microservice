@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import path from "path";
 import { config } from "./config/environment";
 import { logger, planController, messageBus } from "./config/dependencies";
 import { createPlanRoutes } from "./adapters/driving/http/routes/planRoutes";
@@ -21,6 +22,9 @@ app.use(cors(corsOptions));
 // Middleware básico
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Servir archivos estáticos (imágenes)
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Inyectar logger en cada request
 app.use((req, res, next) => {

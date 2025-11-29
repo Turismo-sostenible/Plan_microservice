@@ -2,9 +2,9 @@
 
 export const config = {
   server: {
-    port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
+    port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3002,
     host: process.env.HOST || "0.0.0.0",
-    corsOrigin: process.env.CORS_ORIGIN || "http://localhost:3001",
+    corsOrigin: process.env.CORS_ORIGIN || "http://localhost:3000",
   },
   mongodb: {
     uri: process.env.MONGODB_URI || "mongodb://localhost:27017/plans_service",
